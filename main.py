@@ -1,7 +1,9 @@
 import sys
 import pygame
 import math
+import numpy as np
 from settings import Settings
+from cell_rules import GameOfLife
 
 # GLOBALS
 s = Settings()
@@ -10,13 +12,17 @@ WHITE = (255, 255, 255)
 TEAL = (0, 185, 185)
 MAGENTA = (200, 0, 100)
 
+screen = pygame.display.set_mode(s.size, flags=pygame.RESIZABLE)
+# screen should be global bc it's easier
+# repl.it runs 800x600, set in Settings().size
+pygame.display.set_caption("The Game of Life")
+
+habitats = s.population
+
 
 def runGame():
-
     pygame.init()
-    # repl.it runs 800x600, set in Settings().size
-    screen = pygame.display.set_mode(s.size, flags=pygame.RESIZABLE)  
-    pygame.display.set_caption("The Game of Life")
+
     screen.fill(WHITE)
 
     for x in range(s.screen_width):
@@ -34,37 +40,66 @@ def runGame():
                 if event.key == pygame.K_ESCAPE:
                     sys.exit()  # quit on <ESC>
 
+            if event.type == pygame.KEYDOWN:  # start on <RETURN> press for now
+                if event.key == pygame.K_RETURN:
+                    gol = GameOfLife(habitats.shape[0], habitats.shape[1], habitats)
+                    print("the game of life has begun")
+
+                if event.key == pygame.K_RIGHT:     # THIS DOES NOT WORK YET
+                    gol.evolve()
+                    print("evolving")
+
         # mouse click event to place a square
         # this method allows for press and hold to paint the screen
         left, middle, right = pygame.mouse.get_pressed()
 
         # get cell the mouse is over currently
-        cell = getRectFromMouse()
+        cp = getClickPos()
 
         # color cell according to pressed button
         if left:
-            pygame.draw.rect(screen, TEAL, cell)
+            habitats[cp[0], cp[1]] = 1  # sets drawn cell as live in habitat array
 
-        if right:
-            pygame.draw.rect(screen, MAGENTA, cell)
-            
+        # if right:
+        #     drawCell(cp, MAGENTA)
+
         if middle:
-            pygame.draw.rect(screen, WHITE, cell)
-            pygame.draw.rect(screen, BLACK, cell, 1)
+            habitats[cp[0], cp[1]] = 0  # sets drawn cell as dead in habitat array
+
+        '''
+        draws cell for every living cell found in habitats array
+        '''
+        for row in range(0, habitats.shape[0]):
+            for col in range(0, habitats.shape[1]):
+                if habitats[row, col] == 1:
+                    drawCell((row, col), TEAL)
+                else:
+                    drawCell((row, col), WHITE)
+                    drawCell((row, col), BLACK, 1)
 
         pygame.display.flip()
 
 
-def getRectFromMouse():
-    """ 
-    Returns a pygame rectangle object located under the mouse 
+def getClickPos():
+    """
+    Returns whole cell position tuple for the cell under the mouse
     Uses block_size defined in Settings.py
     """
-    x, y = pygame.mouse.get_pos()  # pos is an (x, y) coordinate
-    posX = math.floor(x / s.block_size) * s.block_size  # rounds to nearest block corner
-    posY = math.floor(y / s.block_size) * s.block_size
-    square = pygame.Rect(posX, posY, s.block_size, s.block_size)
-    return square
+    x, y = pygame.mouse.get_pos()  # get_pos returns an (x, y) tuple of resolution
+    cellX = math.floor(x / s.block_size)  # converts resolution to whole cell number
+    cellY = math.floor(y / s.block_size)
+    return cellX, cellY
+
+
+def drawCell(position, color, border=0):
+    """
+    draws a pygame rectangle at the given (x, y) position tuple
+    Uses block_size defined in Settings.py
+    """
+    X = position[0] * s.block_size  # converts cell to rounded resolution
+    Y = position[1] * s.block_size
+    cell = pygame.Rect(X, Y, s.block_size, s.block_size)
+    pygame.draw.rect(screen, color, cell, border)
 
 
 if __name__ == "__main__":
