@@ -28,9 +28,8 @@ def runGame():
     # Draw initial board
     for x in range(s.screen_width):
         for y in range(s.screen_height):
-            rect = pygame.Rect(x * s.block_size,
-                               y * s.block_size, s.block_size,
-                               s.block_size)
+            rect = pygame.Rect(x * s.block_size, y * s.block_size,
+                               s.block_size, s.block_size)
             pygame.draw.rect(screen, BLACK, rect, 1)
 
     started = False
@@ -46,11 +45,12 @@ def runGame():
 
             if event.type == pygame.KEYDOWN:  # start on <RETURN> press for now
                 if event.key == pygame.K_RETURN:
-                    gol = GameOfLife(habitats.shape[0], habitats.shape[1], initial)
+                    gol = GameOfLife(habitats.shape[0], habitats.shape[1],
+                                     initial)
                     started = True
                     print("the game of life has begun")
 
-                if event.key == pygame.K_RIGHT:     # THIS DOES NOT WORK YET
+                if event.key == pygame.K_RIGHT:
                     gol.evolve()
                     print("evolving")
 
@@ -61,21 +61,21 @@ def runGame():
             left, middle, right = pygame.mouse.get_pressed()
 
             # get cell the mouse is over currently
-            cp = getClickPos()
+            cell_pos = getClickPos()
 
             # color cell according to pressed button
             if left:
-                initial.add(cp)
-                print(f"Selected cell {cp}")
-                habitats[cp[0], cp[1]] = 1  # sets drawn cell as live in habitat array
+                initial.add(cell_pos)
+                print(f"Selected cell {cell_pos}")
+                habitats[cell_pos] = 1  # sets drawn cell as live in habitat array
 
             # if right:
             #     drawCell(cp, MAGENTA)
 
             if middle:
-                initial.remove(cp)
-                habitats[cp[0], cp[1]] = 0  # sets drawn cell as dead in habitat array
-
+                initial.remove(cell_pos)
+                habitats[
+                    cell_pos] = 0  # sets drawn cell as dead in habitat array
 
             # draws cell for every living cell found in habitats array
             for row in range(0, habitats.shape[0]):
@@ -85,17 +85,15 @@ def runGame():
                     else:
                         drawCell((row, col), WHITE)
                         drawCell((row, col), BLACK, 1)
-        else:
-            for y, row in enumerate(gol.cells):
-                for x, cell in enumerate(row):
+        else: # See this copy pasted code? yeah, that's what i did lol. there has got to be a better way
+            for i, row in enumerate(gol.cells):
+                for j, cell in enumerate(row):
                     if cell.state == LIVE:
-                        drawCell((x,y),TEAL)
+                        drawCell((i, j), TEAL)
                     else:
-                        drawCell((x, y), WHITE)
-                        drawCell((x, y), BLACK, 1)
+                        drawCell((i, j), WHITE)
+                        drawCell((i, j), BLACK, 1)
         pygame.display.flip()
-
-      
 
 
 def getClickPos():
@@ -103,8 +101,10 @@ def getClickPos():
     Returns whole cell position tuple for the cell under the mouse
     Uses block_size defined in Settings.py
     """
-    x, y = pygame.mouse.get_pos()  # get_pos returns an (x, y) tuple of resolution
-    cellX = math.floor(x / s.block_size)  # converts resolution to whole cell number
+    x, y = pygame.mouse.get_pos(
+    )  # get_pos returns an (x, y) tuple of resolution
+    cellX = math.floor(
+        x / s.block_size)  # converts resolution to whole cell number
     cellY = math.floor(y / s.block_size)
     return cellX, cellY
 
