@@ -3,7 +3,7 @@ import pygame
 import math
 import numpy as np
 from settings import Settings
-from cell_rules import GameOfLife
+from cell_rules import GameOfLife, LIVE, DEAD
 
 # GLOBALS
 s = Settings()
@@ -25,6 +25,7 @@ def runGame():
 
     screen.fill(WHITE)
 
+    # Draw initial board
     for x in range(s.screen_width):
         for y in range(s.screen_height):
             rect = pygame.Rect(x * s.block_size,
@@ -32,6 +33,9 @@ def runGame():
                                s.block_size)
             pygame.draw.rect(screen, BLACK, rect, 1)
 
+    started = False
+    initial = set()
+    # Game loop
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -42,42 +46,56 @@ def runGame():
 
             if event.type == pygame.KEYDOWN:  # start on <RETURN> press for now
                 if event.key == pygame.K_RETURN:
-                    gol = GameOfLife(habitats.shape[0], habitats.shape[1], habitats)
+                    gol = GameOfLife(habitats.shape[0], habitats.shape[1], initial)
+                    started = True
                     print("the game of life has begun")
 
                 if event.key == pygame.K_RIGHT:     # THIS DOES NOT WORK YET
                     gol.evolve()
                     print("evolving")
 
-        # mouse click event to place a square
-        # this method allows for press and hold to paint the screen
-        left, middle, right = pygame.mouse.get_pressed()
+        # Allow user to change board state if game hasn't started
+        if not started:
+            # mouse click event to place a square
+            # this method allows for press and hold to paint the screen
+            left, middle, right = pygame.mouse.get_pressed()
 
-        # get cell the mouse is over currently
-        cp = getClickPos()
+            # get cell the mouse is over currently
+            cp = getClickPos()
 
-        # color cell according to pressed button
-        if left:
-            habitats[cp[0], cp[1]] = 1  # sets drawn cell as live in habitat array
+            # color cell according to pressed button
+            if left:
+                initial.add(cp)
+                print(f"Selected cell {cp}")
+                habitats[cp[0], cp[1]] = 1  # sets drawn cell as live in habitat array
 
-        # if right:
-        #     drawCell(cp, MAGENTA)
+            # if right:
+            #     drawCell(cp, MAGENTA)
 
-        if middle:
-            habitats[cp[0], cp[1]] = 0  # sets drawn cell as dead in habitat array
+            if middle:
+                initial.remove(cp)
+                habitats[cp[0], cp[1]] = 0  # sets drawn cell as dead in habitat array
 
-        '''
-        draws cell for every living cell found in habitats array
-        '''
-        for row in range(0, habitats.shape[0]):
-            for col in range(0, habitats.shape[1]):
-                if habitats[row, col] == 1:
-                    drawCell((row, col), TEAL)
-                else:
-                    drawCell((row, col), WHITE)
-                    drawCell((row, col), BLACK, 1)
 
+            # draws cell for every living cell found in habitats array
+            for row in range(0, habitats.shape[0]):
+                for col in range(0, habitats.shape[1]):
+                    if habitats[row, col] == 1:
+                        drawCell((row, col), TEAL)
+                    else:
+                        drawCell((row, col), WHITE)
+                        drawCell((row, col), BLACK, 1)
+        else:
+            for y, row in enumerate(gol.cells):
+                for x, cell in enumerate(row):
+                    if cell.state == LIVE:
+                        drawCell((x,y),TEAL)
+                    else:
+                        drawCell((x, y), WHITE)
+                        drawCell((x, y), BLACK, 1)
         pygame.display.flip()
+
+      
 
 
 def getClickPos():
