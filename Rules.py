@@ -1,3 +1,4 @@
+from Settings import Settings
 from copy import deepcopy
 
 # Useful constants
@@ -16,18 +17,30 @@ class Cell:
         self.state = state
 
 
-class GameOfLife():
+class GameOfLife:
     """
     A GameOfLife object contains the internal representation of the current state of cells
         -call the evolve() method to update the internal population to the next generation
     """
 
-    def __init__(self, height, width, initial=set()):
-        self.height = height
-        self.width = width
+    def __init__(self, initial):
+        self.height = Settings().h
+        self.width = Settings().w
 
-        self.cells = [[Cell(LIVE) if (i, j) in initial else Cell(DEAD)
-                       for j in range(width)] for i in range(height)]
+        # self.cells = [[Cell(LIVE) if (i, j) in initial else Cell(DEAD)
+        #                for j in range(self.width)] for i in range(self.height)]
+
+        self.cells = []
+        for i in range(self.height):
+            col = []
+            for j in range(self.width):
+                if initial[i, j] == 1:
+                    col.append(Cell(LIVE))
+                else:
+                    col.append(Cell(DEAD))
+            self.cells.append(col)
+
+        self.started = False
 
     def print(self, *args):
         """ Prints a string based representation of the current state """
@@ -38,12 +51,12 @@ class GameOfLife():
         print(*args)
 
     def evolve(self):
-        """ 
+        """
         Evolves the current state one generation using GoL rules
-            Rules applied to find the next state of each cell --> 
+            Rules applied to find the next state of each cell -->
                 * Any live cell with more than 3 or less than 2 live neighbors dies
                 * A live cell with 2-3 live neighbors lives on
-                * Any dead cell with exactly 3 live neighbnors becomes alive
+                * Any dead cell with exactly 3 live neighbors becomes alive
         """
 
         # Copy the current population until the new state is fully created
@@ -54,10 +67,10 @@ class GameOfLife():
 
                 # Reset neighbor count to 0
                 live_neighbors = 0
-                
+
                 # Loop through neighbors
-                for k in range(i-1, i+2):
-                    for l in range(j-1, j+2):
+                for k in range(i - 1, i + 2):
+                    for l in range(j - 1, j + 2):
 
                         # Ignore the cell itself
                         if (k, l) == (i, j):
@@ -75,9 +88,8 @@ class GameOfLife():
                 if cell.state == 1:
                     if live_neighbors < 2 or live_neighbors > 3:
                         cell.state = 0
-                else:
-                    if live_neighbors == 3:
-                        cell.state = 1
+                elif live_neighbors == 3:
+                    cell.state = 1
 
         self.cells = new_gen
 
