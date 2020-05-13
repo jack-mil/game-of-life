@@ -7,21 +7,21 @@ LIVE = 1
 
 
 class Cell:
-    """
+    '''
     A simple representation of a cell
     May be further expanded with more features or states
     can be used with inheritance
-    """
+    '''
 
     def __init__(self, state=0):
         self.state = state
 
 
 class GameOfLife:
-    """
+    '''
     A GameOfLife object contains the internal representation of the current state of cells
         -call the evolve() method to update the internal population to the next generation
-    """
+    '''
 
     def __init__(self, initial):
         self.height = Settings().h
@@ -34,7 +34,7 @@ class GameOfLife:
         for i in range(self.height):
             col = []
             for j in range(self.width):
-                if initial[i, j] == 1:
+                if initial[i, j] == LIVE:
                     col.append(Cell(LIVE))
                 else:
                     col.append(Cell(DEAD))
@@ -43,7 +43,7 @@ class GameOfLife:
         self.started = False
 
     def print(self, *args):
-        """ Prints a string based representation of the current state """
+        ''' Prints a string based representation of the current state '''
         for row in self.cells:
             for cell in row:
                 print(f'{"#" if cell.state else ".":<2}', sep='', end='')
@@ -51,13 +51,13 @@ class GameOfLife:
         print(*args)
 
     def evolve(self):
-        """
+        '''
         Evolves the current state one generation using GoL rules
             Rules applied to find the next state of each cell -->
                 * Any live cell with more than 3 or less than 2 live neighbors dies
                 * A live cell with 2-3 live neighbors lives on
                 * Any dead cell with exactly 3 live neighbors becomes alive
-        """
+        '''
 
         # Copy the current population until the new state is fully created
         new_gen = deepcopy(self.cells)
@@ -95,7 +95,7 @@ class GameOfLife:
 
 
 if __name__ == '__main__':
-    pop = GameOfLife(4, 4, {(1, 0), (1, 1), (1, 2)})
+    pop = GameOfLife({(1, 0), (1, 1), (1, 2)})
     pop.print('\n')
     pop.evolve()
     pop.print('\n')

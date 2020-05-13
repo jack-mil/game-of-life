@@ -1,7 +1,10 @@
 import numpy as np
 
-
 class Settings:
+    '''
+    Settings for the Game of Life player. Defaults can be modified.
+    (Extend docstring when utilized more)
+    '''
     def __init__(self,
                  px_height=800,
                  px_width=600,
