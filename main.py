@@ -1,9 +1,11 @@
-import sys
-import pygame
 import math
+import sys
 import time
-from Settings import Settings
-from Rules import GameOfLife, LIVE
+
+import pygame
+
+from rules import LIVE, GameOfLife
+from settings import Settings
 
 #     Standard python style guide suggestions:
 #     classes use CapitalCase

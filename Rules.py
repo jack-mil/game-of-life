@@ -1,5 +1,6 @@
-from Settings import Settings
 from copy import deepcopy
+
+from settings import Settings
 
 # Useful constants
 DEAD = 0
@@ -20,7 +21,7 @@ class Cell:
 class GameOfLife:
     '''
     A GameOfLife object contains the internal representation of the current state of cells
-        -call the evolve() method to update the internal population to the next generation
+    - call the evolve() method to update the internal population to the next generation
     '''
 
     def __init__(self, initial):
@@ -53,10 +54,11 @@ class GameOfLife:
     def evolve(self):
         '''
         Evolves the current state one generation using GoL rules
-            Rules applied to find the next state of each cell -->
-                * Any live cell with more than 3 or less than 2 live neighbors dies
-                * A live cell with 2-3 live neighbors lives on
-                * Any dead cell with exactly 3 live neighbors becomes alive
+
+        Rules applied to find the next state of each cell
+          1. Any live cell with more than 3 or less than 2 live neighbors dies
+          2. A live cell with 2-3 live neighbors lives on
+          3. Any dead cell with exactly 3 live neighbors becomes alive
         '''
 
         # Copy the current population until the new state is fully created
@@ -95,6 +97,7 @@ class GameOfLife:
 
 
 if __name__ == '__main__':
+    # Example if run as script
     pop = GameOfLife({(1, 0), (1, 1), (1, 2)})
     pop.print('\n')
     pop.evolve()
